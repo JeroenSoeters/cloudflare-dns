@@ -1,0 +1,29 @@
+/*
+ * Formae Plugin Manifest
+ *
+ * This file defines metadata for your Formae plugin.
+ * Update the values below to match your plugin.
+ */
+
+// TODO: Change to your plugin name (lowercase, letters/numbers/hyphens)
+name = "cloudflare-dns"
+
+// TODO: Update version following semver
+version = "0.1.0"
+
+// TODO: Resource type namespace prefix (uppercase)
+// This appears in resource types: CLOUDFLARE::Service::Resource
+namespace = "CLOUDFLARE"
+
+// TODO: Describe what your plugin does
+description = "Formae plugin for managing Cloudflare DNS records"
+
+// TODO: Your license (SPDX identifier)
+license = "BSD-3-Clause"
+
+// TODO: Minimum formae version required
+minFormaeVersion = "0.80.0"
+
+output {
+  renderer = new JsonRenderer {}
+}

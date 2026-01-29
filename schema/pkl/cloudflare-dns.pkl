@@ -1,0 +1,56 @@
+/*
+ * Cloudflare DNS Plugin Schema
+ *
+ * This file defines the DNS Record resource type for managing
+ * Cloudflare DNS records.
+ */
+module cloudflare_dns
+
+import "@formae/formae.pkl"
+
+// =============================================================================
+// Record - DNS Record resource
+// =============================================================================
+
+/// A Cloudflare DNS Record.
+@formae.ResourceHint {
+    type = "CLOUDFLARE::DNS::Record"
+    identifier = "$.id"
+}
+class Record extends formae.Resource {
+    fixed hidden type: String = "CLOUDFLARE::DNS::Record"
+
+    /// The zone ID where this record belongs.
+    @formae.FieldHint { createOnly = true }
+    zone_id: String
+
+    /// The DNS record name (e.g., "example.com" or "sub.example.com").
+    @formae.FieldHint { createOnly = true }
+    name: String
+
+    /// The type of DNS record (A, AAAA, CNAME, MX, TXT, etc.).
+    @formae.FieldHint { createOnly = true }
+    record_type: String
+
+    /// The content of the DNS record (e.g., IP address, target hostname).
+    @formae.FieldHint {}
+    content: String
+
+    /// Time to live in seconds. 1 means automatic (Cloudflare default).
+    /// Valid values: 1 (auto), or 60-86400.
+    @formae.FieldHint {}
+    ttl: Int = 1
+
+    /// Whether the record is proxied through Cloudflare.
+    /// Only applies to A, AAAA, and CNAME records.
+    @formae.FieldHint {}
+    proxied: Boolean = false
+
+    /// Optional comment for the DNS record.
+    @formae.FieldHint {}
+    comment: String?
+
+    /// Priority for MX, SRV, and URI records. Required for MX records.
+    @formae.FieldHint {}
+    priority: Int?
+}

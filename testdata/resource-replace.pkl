@@ -1,0 +1,44 @@
+/*
+ * Conformance Test: Replace Resource
+ *
+ * This file modifies a createOnly field to trigger resource replacement.
+ * Changes from resource.pkl:
+ *   - name: changed to add "-replaced" suffix
+ *
+ * The name field has createOnly=true, so formae should delete the
+ * existing resource and create a new one with the new name.
+ */
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+
+import "@cloudflare-dns/cloudflare-dns.pkl" as dns
+
+local stackName = "plugin-sdk-test-stack"
+local testRunID = read("env:FORMAE_TEST_RUN_ID")
+local zoneID = read("env:CLOUDFLARE_ZONE_ID")
+
+forma {
+  new formae.Stack {
+    label = stackName
+    description = "Plugin SDK conformance test stack"
+  }
+
+  new formae.Target {
+    label = "cloudflare"
+    namespace = "CLOUDFLARE"
+    config = new Mapping {
+      ["zone_id"] = zoneID
+    }
+  }
+
+  new dns.Record {
+    label = "plugin-sdk-test-record"
+    zone_id = zoneID
+    name = "formae-test-\(testRunID)-replaced"  // CHANGED - triggers replacement
+    record_type = "A"
+    content = "192.0.2.1"
+    ttl = 300
+    proxied = false
+    comment = "Formae conformance test"
+  }
+}
