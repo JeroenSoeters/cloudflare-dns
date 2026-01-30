@@ -1,0 +1,45 @@
+/*
+ * Conformance Test: Update Resource (in-place)
+ *
+ * This file modifies mutable fields to trigger an in-place update.
+ * Changes from resource.pkl:
+ *   - content: changed from "192.0.2.1" to "192.0.2.2"
+ *   - ttl: changed from 300 to 600
+ *   - comment: added a comment
+ *
+ * These fields do NOT have createOnly=true, so formae should update
+ * the resource in place without replacement.
+ */
+amends "@formae/forma.pkl"
+import "@formae/formae.pkl"
+
+import "@cloudflare-dns/cloudflare-dns.pkl" as dns
+
+local stackName = "plugin-sdk-test-stack"
+local testRunID = read("env:FORMAE_TEST_RUN_ID")
+
+forma {
+  new formae.Stack {
+    label = stackName
+    description = "Plugin SDK conformance test stack"
+  }
+
+  new formae.Target {
+    label = "cloudflare-target"
+    namespace = "CLOUDFLARE"
+    config = new Mapping {
+      ["api_token"] = read("env:CLOUDFLARE_API_TOKEN")
+      ["zone_id"] = read("env:CLOUDFLARE_ZONE_ID")
+    }
+  }
+
+  new dns.DNSRecord {
+    label = "plugin-sdk-test-record"
+    record_type = "A"                                     // unchanged (createOnly)
+    name = "formae-test-\(testRunID)"                     // unchanged (createOnly)
+    content = "192.0.2.2"                                 // CHANGED from 192.0.2.1
+    ttl = 600                                             // CHANGED from 300
+    proxied = false
+    comment = "Updated by conformance test"               // ADDED
+  }
+}

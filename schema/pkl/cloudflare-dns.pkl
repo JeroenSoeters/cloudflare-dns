@@ -1,0 +1,87 @@
+/*
+ * Cloudflare DNS Plugin Schema
+ *
+ * This file defines the resource types for managing Cloudflare DNS records.
+ * Supports A, AAAA, CNAME, MX, TXT, NS, CAA, and SRV record types.
+ */
+module cloudflare_dns
+
+import "@formae/formae.pkl"
+
+// =============================================================================
+// Config - Target Configuration
+// =============================================================================
+
+/// Configuration for connecting to Cloudflare API.
+/// Used in the Target's config mapping.
+class Config {
+    /// Cloudflare API token with DNS edit permissions
+    api_token: String
+
+    /// Zone ID for the DNS zone to manage
+    zone_id: String
+}
+
+// =============================================================================
+// RecordType - Enumeration of supported DNS record types
+// =============================================================================
+
+/// Supported DNS record types
+typealias RecordType = "A"|"AAAA"|"CNAME"|"MX"|"TXT"|"NS"|"CAA"|"SRV"
+
+// =============================================================================
+// DNSRecord - Main resource definition
+// =============================================================================
+
+/// A Cloudflare DNS record.
+/// Supports A, AAAA, CNAME, MX, TXT, NS, CAA, and SRV record types.
+@formae.ResourceHint {
+    type = "CLOUDFLARE::DNS::Record"
+    identifier = "$.Id"
+}
+class DNSRecord extends formae.Resource {
+    fixed hidden type: String = "CLOUDFLARE::DNS::Record"
+
+    /// The type of DNS record.
+    /// Cannot be changed after creation (triggers replacement).
+    @formae.FieldHint { createOnly = true }
+    record_type: RecordType
+
+    /// The DNS hostname (e.g., "www.example.com" or "@" for root).
+    /// Cannot be changed after creation (triggers replacement).
+    @formae.FieldHint { createOnly = true }
+    name: String
+
+    /// The record value. Format varies by type:
+    /// - A: IPv4 address (e.g., "192.0.2.1")
+    /// - AAAA: IPv6 address (e.g., "2001:db8::1")
+    /// - CNAME: Target hostname (e.g., "target.example.com")
+    /// - MX: Mail server hostname (e.g., "mail.example.com")
+    /// - TXT: Text value (e.g., "v=spf1 include:_spf.example.com ~all")
+    /// - NS: Nameserver hostname (e.g., "ns1.example.com")
+    /// - CAA: CAA record value (e.g., "0 issue \"letsencrypt.org\"")
+    /// - SRV: "weight port target" (e.g., "5 5060 sipserver.example.com")
+    @formae.FieldHint {}
+    content: String
+
+    /// Time to live in seconds.
+    /// Use 1 for automatic TTL (Cloudflare default).
+    /// Defaults to 1 (automatic).
+    @formae.FieldHint {}
+    ttl: Int = 1
+
+    /// Whether the record is proxied through Cloudflare.
+    /// Only applicable for A, AAAA, and CNAME records.
+    /// Defaults to false.
+    @formae.FieldHint {}
+    proxied: Boolean = false
+
+    /// Priority value for MX and SRV records.
+    /// Required for MX and SRV record types.
+    @formae.FieldHint {}
+    priority: Int?
+
+    /// Optional comment/note about this record.
+    @formae.FieldHint {}
+    comment: String?
+}

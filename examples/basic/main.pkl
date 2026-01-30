@@ -1,0 +1,89 @@
+/*
+ * Basic Example - Cloudflare DNS Records
+ *
+ * This example shows how to define various DNS record types using the plugin.
+ * Run with: formae apply --mode reconcile --watch examples/basic/main.pkl
+ *
+ * Required environment variables:
+ *   CLOUDFLARE_API_TOKEN - API token with DNS edit permissions
+ *   CLOUDFLARE_ZONE_ID - Zone ID for your domain
+ */
+amends "@formae/forma.pkl"
+
+import "@formae/formae.pkl"
+import "@cloudflare-dns/cloudflare-dns.pkl" as dns
+
+forma {
+  new formae.Stack {
+    label = "dns-example"
+    description = "Example DNS records stack"
+  }
+
+  new formae.Target {
+    label = "cloudflare"
+    namespace = "CLOUDFLARE"
+    config = new dns.Config {
+      api_token = read("env:CLOUDFLARE_API_TOKEN")
+      zone_id = read("env:CLOUDFLARE_ZONE_ID")
+    }
+  }
+
+  // A record - points a hostname to an IPv4 address
+  new dns.DNSRecord {
+    label = "web-server"
+    record_type = "A"
+    name = "www"
+    content = "192.0.2.1"
+    ttl = 300
+    proxied = true  // Enable Cloudflare proxy for A records
+  }
+
+  // AAAA record - points a hostname to an IPv6 address
+  new dns.DNSRecord {
+    label = "web-server-ipv6"
+    record_type = "AAAA"
+    name = "www"
+    content = "2001:db8::1"
+    ttl = 300
+    proxied = true
+  }
+
+  // CNAME record - creates an alias
+  new dns.DNSRecord {
+    label = "blog-alias"
+    record_type = "CNAME"
+    name = "blog"
+    content = "www.example.com"
+    ttl = 300
+    proxied = true
+  }
+
+  // MX record - specifies mail server (requires priority)
+  new dns.DNSRecord {
+    label = "mail-primary"
+    record_type = "MX"
+    name = "@"  // @ means zone apex (root domain)
+    content = "mail.example.com"
+    ttl = 3600
+    priority = 10
+  }
+
+  // TXT record - arbitrary text (SPF, DKIM, verification, etc.)
+  new dns.DNSRecord {
+    label = "spf-record"
+    record_type = "TXT"
+    name = "@"
+    content = "v=spf1 include:_spf.example.com ~all"
+    ttl = 3600
+  }
+
+  // CAA record - certificate authority authorization
+  new dns.DNSRecord {
+    label = "caa-letsencrypt"
+    record_type = "CAA"
+    name = "@"
+    content = "0 issue \"letsencrypt.org\""
+    ttl = 3600
+    comment = "Allow Let's Encrypt to issue certificates"
+  }
+}
