@@ -32,4 +32,5 @@ PklProject.deps.json
 # Claude Code
 CLAUDE.md
 .claude/
+.serena/
 formae-plugin-cloudflare-dns
