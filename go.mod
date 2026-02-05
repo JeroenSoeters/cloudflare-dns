@@ -4,7 +4,7 @@ go 1.25
 
 require (
 	github.com/cloudflare/cloudflare-go v0.116.0
-	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.7
+	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.9
 	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.9
 )
 
