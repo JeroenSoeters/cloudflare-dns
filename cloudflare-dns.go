@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/cloudflare/cloudflare-go"
+	"github.com/platform-engineering-labs/formae/pkg/model"
 	"github.com/platform-engineering-labs/formae/pkg/plugin"
 	"github.com/platform-engineering-labs/formae/pkg/plugin/resource"
 )
@@ -260,9 +261,9 @@ var _ plugin.ResourcePlugin = &Plugin{}
 
 // RateLimit returns the rate limiting configuration for this plugin.
 // Cloudflare API limit: 1200 requests per 5 minutes = 4 requests per second.
-func (p *Plugin) RateLimit() plugin.RateLimitConfig {
-	return plugin.RateLimitConfig{
-		Scope:                            plugin.RateLimitScopeNamespace,
+func (p *Plugin) RateLimit() model.RateLimitConfig {
+	return model.RateLimitConfig{
+		Scope:                            model.RateLimitScopeNamespace,
 		MaxRequestsPerSecondForNamespace: 4,
 	}
 }
@@ -270,27 +271,15 @@ func (p *Plugin) RateLimit() plugin.RateLimitConfig {
 // DiscoveryFilters returns filters to exclude certain resources from discovery.
 // Resources matching ALL conditions in a filter are excluded.
 // Return nil if you want to discover all resources.
-func (p *Plugin) DiscoveryFilters() []plugin.MatchFilter {
-	// Example: exclude resources with a specific tag
-	// return []plugin.MatchFilter{
-	//     {
-	//         ResourceTypes: []string{"CLOUDFLARE::Service::Resource"},
-	//         Conditions: []plugin.FilterCondition{
-	//             {PropertyPath: "$.Tags[?(@.Key=='skip-discovery')].Value", PropertyValue: "true"},
-	//         },
-	//     },
-	// }
+func (p *Plugin) DiscoveryFilters() []model.MatchFilter {
 	return nil
 }
 
 // LabelConfig returns the configuration for extracting human-readable labels
 // from discovered resources.
-func (p *Plugin) LabelConfig() plugin.LabelConfig {
-	return plugin.LabelConfig{
-		// Use the DNS record name as the label
-		DefaultQuery: "$.name",
-
-		// No overrides needed
+func (p *Plugin) LabelConfig() model.LabelConfig {
+	return model.LabelConfig{
+		DefaultQuery:      "$.name",
 		ResourceOverrides: map[string]string{},
 	}
 }
