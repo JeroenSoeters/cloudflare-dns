@@ -22,13 +22,18 @@ BINARY := $(PLUGIN_NAME)
 PLUGIN_BASE_DIR := $(HOME)/.pel/formae/plugins
 INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAME)/v$(PLUGIN_VERSION)
 
-.PHONY: all build test test-unit test-integration lint verify-schema clean install help clean-environment conformance-test conformance-test-crud conformance-test-discovery
+.PHONY: all build test test-unit test-integration lint verify-schema version-file clean install help clean-environment conformance-test conformance-test-crud conformance-test-discovery
 
 all: build
 
-## build: Build the plugin binary and update manifest
-build:
+## version-file: Write schema/pkl/VERSION from the plugin manifest
+## Other targets that load the schema PklProject (build, verify-schema) depend
+## on this so the `read("VERSION")` call in PklProject resolves.
+version-file:
 	@mkdir -p schema/pkl && echo "$(PLUGIN_VERSION)" > schema/pkl/VERSION
+
+## build: Build the plugin binary and update manifest
+build: version-file
 	$(GO) build $(GOFLAGS) -o bin/$(BINARY) .
 	@MIN_VERSION=$$($(GO) list -m -f '{{.Dir}}' github.com/platform-engineering-labs/formae/pkg/plugin 2>/dev/null | xargs -I{} grep 'MinFormaeVersion' {}/version.go 2>/dev/null | grep -oE '"[0-9]+\.[0-9]+\.[0-9]+"' | tr -d '"'); \
 	if [ -n "$$MIN_VERSION" ]; then \
@@ -59,7 +64,7 @@ lint:
 
 ## verify-schema: Validate PKL schema files
 ## Checks that schema files are well-formed and follow formae conventions.
-verify-schema:
+verify-schema: version-file
 	$(GO) run github.com/platform-engineering-labs/formae/pkg/plugin/testutil/cmd/verify-schema --namespace $(PLUGIN_NAMESPACE) ./schema/pkl
 
 ## clean: Remove build artifacts
