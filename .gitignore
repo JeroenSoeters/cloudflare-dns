@@ -28,9 +28,9 @@ dist/
 .pkl-cache/
 *.pkl-expected.pcf
 PklProject.deps.json
+schema/pkl/VERSION
 
 # Claude Code
 CLAUDE.md
 .claude/
 .serena/
-formae-plugin-cloudflare-dns
