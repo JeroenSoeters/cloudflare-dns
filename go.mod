@@ -6,7 +6,7 @@ require (
 	github.com/cloudflare/cloudflare-go v0.116.0
 	github.com/platform-engineering-labs/formae/pkg/model v0.1.23
 	github.com/platform-engineering-labs/formae/pkg/plugin v0.2.1
-	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.2.2
+	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.2.3
 )
 
 require (
